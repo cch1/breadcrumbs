@@ -1,1 +1,1 @@
-require 'simplified_breadcrumbs'
+require 'breadcrumbs'
