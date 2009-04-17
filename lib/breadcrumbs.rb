@@ -5,7 +5,7 @@ module Breadcrumbs
     def add_breadcrumb(name, url =  nil)
       @breadcrumbs ||= []
       url = send(url) if url.is_a?(Symbol)
-      name = send(name).titleize if name.is_a?(Symbol)
+      name = send(name).to_s.titleize if name.is_a?(Symbol)
       @breadcrumbs << [name, url]
     end  
   end
