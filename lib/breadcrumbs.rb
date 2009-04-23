@@ -2,7 +2,7 @@ module Breadcrumbs
   module InstanceMethods
     protected
     # Append a breadcrumb to the end of the trail
-    def add_breadcrumb(name, url =  nil)
+    def add_breadcrumb(name, url = nil)
       @breadcrumbs ||= []
       url = send(url) if url.is_a?(Symbol)
       name = send(name).to_s.titleize if name.is_a?(Symbol)
@@ -22,12 +22,16 @@ module Breadcrumbs
   module HelperMethods
     # Returns HTML markup for the breadcrumbs
     def breadcrumbs(*args)
-      default_options = {:separator => "&nbsp;&raquo;&nbsp;", :tag => :li}
+      default_options = {:separator => "&nbsp;&raquo;&nbsp;"}
       options = default_options.merge(args.extract_options!)
-      @breadcrumbs.map do |name, url|
-        crumb = link_to_unless_current(name, url)
-        options[:tag] && content_tag(options[:tag], crumb) || crumb
-      end.join("#{options[:separator]}")
+      if p = options[:partial]
+        render :partial => p, :collection => @breadcrumbs
+      else
+        @breadcrumbs.map do |name, url|
+          crumb = link_to_unless_current(name, url)
+          options[:tag] ? content_tag(options[:tag], crumb) : crumb
+        end.join(options[:separator])
+      end
     end
   end
 end
