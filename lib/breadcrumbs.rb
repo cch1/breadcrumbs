@@ -3,10 +3,13 @@ module Breadcrumbs
     protected
     # Append a breadcrumb to the end of the trail
     def add_breadcrumb(name, url = nil)
-      @breadcrumbs ||= []
       url = send(url) if url.is_a?(Symbol)
       name = send(name).to_s.titleize if name.is_a?(Symbol)
-      @breadcrumbs << [name, url]
+      breadcrumbs << [name, url]
+    end
+
+    def breadcrumbs
+      @breadcrumbs ||= []
     end
   end
 
@@ -21,8 +24,8 @@ module Breadcrumbs
 
   module HelperMethods
     # Returns HTML markup for the breadcrumbs
-    def breadcrumbs(options = {})
-      options = {:separator => "&nbsp;&raquo;&nbsp;", :collection => @breadcrumbs}.merge(options)
+    def render_breadcrumbs(options = {})
+      options = {:separator => "&nbsp;&raquo;&nbsp;", :collection => breadcrumbs}.merge(options)
       if p = options[:partial]
         render options
       else
@@ -38,6 +41,7 @@ end
 class ActionController::Base
   include Breadcrumbs::InstanceMethods
   helper_method :add_breadcrumb
+  helper_method :breadcrumbs
 end
 
 ActionController::Base.extend(Breadcrumbs::ClassMethods)
