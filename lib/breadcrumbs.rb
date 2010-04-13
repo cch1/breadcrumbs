@@ -11,8 +11,6 @@ module Breadcrumbs
     protected
     # Append a breadcrumb to the end of the trail
     def add_breadcrumb(name, url = nil)
-      url = send(url) if url.is_a?(Symbol)
-      name = send(name).to_s.titleize if name.is_a?(Symbol)
       breadcrumbs << Crumb.new(name, url)
     end
 
@@ -22,10 +20,14 @@ module Breadcrumbs
   end
 
   module ClassMethods
-    # Append a breadcrumb to the end of the trail by deferring evaluation until the filter processing.
+    # Append a breadcrumb to the end of the trail.  A symbol will be evaluated in the context of the controller instance.
     def add_breadcrumb(name, url = nil, options = {})
       before_filter(options) do |controller|
-        controller.send(:add_breadcrumb, name, url)
+        controller.instance_eval do
+          url = __send__(url) if url.is_a?(Symbol)
+          name = __send__(name).to_s.titleize if name.is_a?(Symbol)
+          add_breadcrumb(name, url)
+        end
       end
     end
   end
